@@ -6,21 +6,24 @@ import { parsePagination } from '../utils/pagination';
 
 class UserController {
   async getAllUsers(req: Request, res: Response) {
-  try {
-    const pagination = parsePagination(req.query, 5);
-    if (pagination) {
-      const result = await userService.getUsersPaginated(pagination);
-      return res.status(200).json(result);
-    }
+    try {
+      const q = typeof req.query.q === 'string' ? req.query.q : undefined;
+      const filter = typeof req.query.filter === 'string' ? req.query.filter : undefined;
+      const pagination = parsePagination(req.query, 5);
 
-    const users = await userService.getAllUsers();
-    res.status(200).json(users);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    console.error('Error getting users:', message);
-    res.status(500).json({ error: 'Database connection not established' });
+      if (pagination) {
+        const result = await userService.getUsersPaginated(pagination, q, filter);
+        return res.status(200).json(result);
+      }
+
+      const users = await userService.getAllUsers(q, filter);
+      return res.status(200).json(users);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error('Error getting users:', message);
+      return res.status(500).json({ error: 'Database connection not established' });
+    }
   }
-}
 
   async createUser(req: Request, res: Response) {
     try {
