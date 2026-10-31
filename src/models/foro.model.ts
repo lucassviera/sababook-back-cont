@@ -79,18 +79,22 @@ export const crearForoDB = async (
 };
 
 // Obtener todos los foros
-export const obtenerTodosForosDB = async (): Promise<ForoConCreador[]> => {
+export const obtenerTodosForosDB = async (search?: string): Promise<ForoConCreador[]> => {
+  const q = search?.trim();
+
   const foros = await prisma.foro.findMany({
+    where: q
+      ? {
+          OR: [
+            { titulo: { contains: q, mode: 'insensitive' } },
+            { descripcion: { contains: q, mode: 'insensitive' } },
+          ],
+        }
+      : undefined,
     include: {
-      usuario: {
-        select: {
-          nombre: true,
-        },
-      },
+      usuario: { select: { nombre: true } },
     },
-    orderBy: {
-      fecha_creacion: 'desc',
-    },
+    orderBy: { fecha_creacion: 'desc' },
   });
 
   return foros.map((f) => ({

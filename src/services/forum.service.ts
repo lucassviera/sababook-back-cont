@@ -19,8 +19,8 @@ class ForumService {
     return await crearForoDB(titulo, descripcion, creadorId, esApl, episodioId);
   }
 
-  async obtenerTodosForos() {
-    return await obtenerTodosForosDB();
+  async obtenerTodosForos(search?: string) {
+    return await obtenerTodosForosDB(search);
   }
 
   async obtenerForoPorId(id: number) {

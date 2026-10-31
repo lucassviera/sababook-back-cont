@@ -1,7 +1,7 @@
 import { prisma } from '../db/connect/db';
 import bcrypt from 'bcrypt';
 import { PaginationParams, Paginated, buildPaginated } from '../utils/pagination';
-import { TipoRol } from '@prisma/client';
+import { Prisma, TipoRol } from '@prisma/client';
 
 export interface User {
   usuario_id: number;
@@ -47,12 +47,11 @@ interface NewUserResult {
 type UpdateUserData = Partial<Omit<User, 'usuario_id'>>;
 
 class UserModel {
-  async getAllUsers(): Promise<UserConRol[]> {
+  async getAllUsers(search?: string, filter?: string): Promise<UserConRol[]> {
     try {
       const users = await prisma.usuario.findMany({
-        orderBy: {
-          usuario_id: 'asc',
-        },
+        where: buildUserWhere(search, filter),
+        orderBy: { usuario_id: 'asc' },
       });
 
       return users.map((u) => ({
@@ -200,15 +199,22 @@ class UserModel {
     }
   }
 
-  async getUsersPaginated(pagination: PaginationParams): Promise<Paginated<UserConRol>> {
+  async getUsersPaginated(
+    pagination: PaginationParams,
+    search?: string,
+    filter?: string
+  ): Promise<Paginated<UserConRol>> {
     try {
+      const where = buildUserWhere(search, filter);
+
       const [users, total] = await prisma.$transaction([
         prisma.usuario.findMany({
+          where,
           orderBy: { usuario_id: 'asc' },
           skip: pagination.skip,
           take: pagination.limit,
         }),
-        prisma.usuario.count(),
+        prisma.usuario.count({ where }),
       ]);
 
       const data = users.map((u) => ({

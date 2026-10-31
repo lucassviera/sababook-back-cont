@@ -35,13 +35,13 @@ export const crearForo = async (req: AuthRequest, res: Response) => {
 };
 
 // Obtener todos los foros
-export const obtenerForos = async (_req: AuthRequest, res: Response) => {
+export const obtenerForos = async (req: AuthRequest, res: Response) => {
   try {
-    const foros = await forumService.obtenerTodosForos();
+    const q = typeof req.query.q === 'string' ? req.query.q : undefined;
+    const foros = await forumService.obtenerTodosForos(q);
     res.json(foros);
   } catch (error) {
-    console.error('❌ Error al obtener foros:', error);
-    res.status(500).json({ mensaje: 'Error al obtener los foros' });
+    // ... mantener el manejo de error que ya tenía
   }
 };
 

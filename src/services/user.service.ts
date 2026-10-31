@@ -15,8 +15,8 @@ export interface UpdateUserDTO {
 }
 
 class UserService {
-  async getAllUsers() {
-    return await userModel.getAllUsers();
+  async getAllUsers(search?: string, filter?: string) {
+    return await userModel.getAllUsers(search, filter);
   }
 
   async getUserById(id: number) {
@@ -35,9 +35,9 @@ class UserService {
     return await userModel.deleteUser(id);
   }
 
-  async getUsersPaginated(pagination: PaginationParams) {
-  return await userModel.getUsersPaginated(pagination);
-}
+  async getUsersPaginated(pagination: PaginationParams, search?: string, filter?: string) {
+    return await userModel.getUsersPaginated(pagination, search, filter);
+  }
 }
 
 export const userService = new UserService();
